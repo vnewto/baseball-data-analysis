@@ -1,9 +1,23 @@
-#Initialize selenium and the driver
+# need to put the whole try block in a loop so that it adds one year each time it does a get request, and does a sleep in the middle. 
+# how many years is reasonable to do?
+# how to deal with the fact that some columns have multiple names or teams per category?
+
+# Dashboard:
+# sort by year (line graph) for each statistic
+# sort by team for each statistic (bar graph)
+# top 10 all-time best players or teams for each statistic (bar graph)
+ 
+
+#Initialize selenium and the driver. import necessary items
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from time import sleep
+
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
@@ -36,6 +50,13 @@ try:
         column_headers_list = column_headers_list[1:4]
         print('column_headers_list: ', column_headers_list)
         
+        #make list of stats I want to pull
+        stats_list = ['Batting Average', 'Home Runs', 'RBI', 'Stolen Bases', 'Total Bases']
+
+        #iterate through table rows to find where those stats live
+            #if stat matches a list item, then proceed with pulling the data
+
+        
         #loop through trs
         count = 1
         for tr in table_items:
@@ -56,34 +77,23 @@ try:
                     if td_class == 'header':
                         h2 = td.find_element(By.TAG_NAME, 'h2')
                         year_text = h2.text
-                        print(f"This td contains an h2 with the title of {year_text}")
-                        continue
-                    
-                    #if class is banner, we don't need it
-                    elif td_class == 'banner':
-                        continue
-                    
-                    #if class is headerBlue, we don't need it
-                    elif td_class == 'headerBlue':
+                        print(f"This td contains an h2 with the title of '{year_text}'")
                         continue
 
                     #if class is datacolBlue, check to see if it's a stat we want
-                    #make list of the stats to pull
                     elif td_class == 'datacolBlue':
-                        stats_list = ['Batting Average', 'Home Runs', 'RBI', 'Stolen Bases', 'Total Bases']
                         a_stat = td.find_element(By.TAG_NAME, 'a')
-                        a_title = a_stat.get_attribute('title')
-                        for stat in stats_list:
-                            if stat.upper() in a_title:
-                                pass
-                            # -----------------FIGURE OUT HOW TO ONLY EXECUTE THE REST OF THIS STUFF IF THIS IS TRUE------
+                        a_text = a_stat.text
+                        if a_text in stats_list:
+                            pass
+                            # -----------------FIGURE OUT HOW TO ONLY EXECUTE THE REST OF THIS STUFF IF THIS IS TRUE------ MOVE THIS UP TO THE BEGINNING OF THE INITIAL LOOP INSTEAD OF NESTED INSIDE?----
                     
                     #if class is datacolBoxR, print #
                     elif td_class == "datacolBoxR":
                         number = td.text
                         print("number: ", number)
                     
-                    #if class is "middle"
+                    #if class contains "middle"
                     #-------------------FIGURE OUT WHAT TO DO HERE --------------------------
                     
                     else:
@@ -131,13 +141,4 @@ finally:
 # total_bases.to_csv("total_bases.csv", sep=',', header=True, index=True)
 
 
-# need to put the whole try block in a loop so that it adds one year each time it does a get request, and does a sleep in the middle. 
-# how many years is reasonable to do?
-# how to deal with the fact that some columns have multiple names or teams per category?
 
-# Dashboard:
-# sort by year (line graph) for each statistic
-# sort by team for each statistic (bar graph)
-# search player?
-# top 10 all-time best players or teams for each statistic (bar graph)
- 
