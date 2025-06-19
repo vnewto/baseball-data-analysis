@@ -1,14 +1,7 @@
-# need to put the whole try block in a loop so that it adds one year each time it does a get request, and does a sleep in the middle. 
-# how many years is reasonable to do?
-# how to deal with the fact that some columns have multiple names or teams per category?
-
 # Dashboard:
 # sort by year (line graph) for each statistic
 # sort by team for each statistic (bar graph)
 # top 10 all-time best players or teams for each statistic (bar graph)
- 
-
-#list of stats to pull: stats_list = ['Batting Average', 'Home Runs', 'RBI', 'Stolen Bases', 'Total Bases']
 
 
 #Initialize selenium and the driver. import necessary items
@@ -28,19 +21,29 @@ import pandas as pd
 #add user agent
 chrome_options = Options()
 chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36')
+chrome_options.add_argument('--headless=new')
+chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--allow-insecure-localhost')
+chrome_options.add_argument('--disable-dev-shm-usage')
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-gpu')
+chrome_options.add_argument('--disable-features=VizDisplayCompositor')
+chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+chrome_options.add_experimental_option('useAutomationExtension', False)
+
+#declare empty lists for each stat
+bat_avg = []
+home_runs = []
+rbi = []
+stolen_bases = []
+total_bases = []
 
 #set up driver
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
 
-#declare empty variables to be used inside loop
-stat_name = 'None'
-year_text = 'None'
-player_name = 'None'
-team = 'None'
-number = 'None'
-
-#declare empty list to append each dictionary row
-baseball_data = []
+#declare stats list
+stats_list = ['Batting Average', 'Home Runs', 'RBI', 'Stolen Bases', 'Total Bases']
 
 #loop through years using year+=1 until 2024 (make sure to include 2024)
 for year in range(2000, 2025):
@@ -54,7 +57,7 @@ for year in range(2000, 2025):
         #Wait until div with id "wrapper" loads or up to 10 seconds, whichever happens first
         print('Waiting for page to load...')
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div#wrapper')))
-        print(f'Located wrapper, scraping {driver.title} page now for year {year}...')
+        print(f'Located wrapper, scraping {driver.title} page now...')
 
         #find div with id "wrapper"
         wrapper = driver.find_element(By.CSS_SELECTOR, 'div[id="wrapper"]')
@@ -71,19 +74,29 @@ for year in range(2000, 2025):
             print('Looking through table items now...')
             count = 1
 
+            #declare year variable
+            year_text = 'None'
+
             for tr in table_items:
+
+                #declare empty variables to be used inside loop
+                stat_name = 'None'
+                player_name = 'None'
+                team = 'None'
+                number = 'None'
 
                 print(f"THIS IS TR {count}")
                 #find the tds inside each tr
                 tds = tr.find_elements(By.TAG_NAME, 'td')
                 if len(tds) > 0:
 
+                    skip_row = False
+
                     #loop through the tds
                     for td in tds:
 
                         #check the class name
                         td_class = td.get_attribute('class')
-                        # print(f"this is a td with class of {td_class}")
 
                         #if class is header, print the year, then skip to the next td
                         if td_class == 'header':
@@ -100,6 +113,12 @@ for year in range(2000, 2025):
                             #if title contains "YEAR BY YEAR LEADER", print title text and make that name of stat
                             if "YEAR BY YEAR LEADER" in a_title:
                                 stat_name = a_tag.text.strip() #define stat_name
+                                #check if stat name is in stats list
+                                if stat_name not in stats_list:
+                                    #skip if not in the list
+                                    skip_row = True
+                                    #exit this loop
+                                    break
                                 print(f"stat_name: {stat_name}")
                         
                         elif td_class.__contains__('datacolBox'):
@@ -128,20 +147,39 @@ for year in range(2000, 2025):
                                     print(f'Team: {team}')
                                 #if not team name, then it's the number
                                 else:
-                                    number = td_text.strip() #define number
+                                    number = float(td_text.strip()) #define number
                                     print(f"number: {number}")
+                        
                         else:
                             print(f'<td> tag found with class {td_class} - does not fit any specified category.')
+                    
+                    if skip_row:
+                        continue
+
                 else: 
                     print("No <td> tags found in this <tr>.")
                 
                 count += 1
 
+
+#stats_list = ['Batting Average', 'Home Runs', 'RBI', 'Stolen Bases', 'Total Bases']
                 #append to the list
-                baseball_data.append({'stat': stat_name, 'year': year_text, 'player': player_name, 'team': team, 'number': number})
+                if stat_name.lower() == 'batting average':
+                    bat_avg.append({'stat': stat_name, 'year': year_text, 'player': player_name, 'team': team, 'number': number})
+                elif stat_name.lower() == 'home runs':
+                    home_runs.append({'stat': stat_name, 'year': year_text, 'player': player_name, 'team': team, 'number': number})
+                elif stat_name.lower() == 'rbi':
+                    rbi.append({'stat': stat_name, 'year': year_text, 'player': player_name, 'team': team, 'number': number})
+                elif stat_name.lower() == 'stolen bases':
+                    stolen_bases.append({'stat': stat_name, 'year': year_text, 'player': player_name, 'team': team, 'number': number})
+                elif stat_name.lower() == 'total bases':
+                    total_bases.append({'stat': stat_name, 'year': year_text, 'player': player_name, 'team': team, 'number': number})
+                else:
+                    print(f'stat_name is {stat_name}, not adding to list.')
 
                 #print length of list after scraping
-                print(f'Scraped a total of {len(baseball_data)} rows.')
+                rows_scraped_this_page = len(bat_avg) + len(home_runs) + len(rbi) + len(total_bases) + len(stolen_bases)
+                print(f'Scraped a total of {rows_scraped_this_page} rows.')
 
                 #reset values to 'None' before restarting loop
                 stat_name = 'None'
@@ -153,24 +191,30 @@ for year in range(2000, 2025):
         print(f'Finished scraping {year} page, pausing for 10 seconds.')
         sleep(10)
 
-        print('baseball_data: ', baseball_data)
-
-        #create dataframe from dictionary
-        baseball_data_df = pd.DataFrame.from_dict(baseball_data)
-
+        total_scraped_so_far = len(bat_avg) + len(home_runs) + len(rbi) + len(total_bases) + len(stolen_bases)
+        print(f'Total rows collected so far: {total_scraped_so_far}')
 
 #print error message if it doesn't work
     except Exception as e: 
         print("couldn't get the webpage")
         print(f"Exception: {type(e).__name__} {e}")
 
-    #quit driver when done
-    finally:
-        driver.quit()
+#quit driver when done
+driver.quit()
 
+#create dataframes from dictionaries
+bat_avg_df = pd.DataFrame.from_dict(bat_avg)
+home_runs_df = pd.DataFrame.from_dict(home_runs)
+rbi_df = pd.DataFrame.from_dict(rbi)
+total_bases_df = pd.DataFrame.from_dict(total_bases)
+stolen_bases_df = pd.DataFrame.from_dict(stolen_bases)
 
-# #write to csv file
-baseball_data_df.to_csv("baseball_data.csv", sep=',', header=True, index=True)
+# #write to csv files
+bat_avg_df.to_csv("csv/batting_average.csv", sep=',', header=True, index=False)
+home_runs_df.to_csv("csv/home_runs.csv", sep=',', header=True, index=False)
+rbi_df.to_csv("csv/rbi.csv", sep=',', header=True, index=False)
+total_bases_df.to_csv("csv/total_bases.csv", sep=',', header=True, index=False)
+stolen_bases_df.to_csv("csv/stolen_bases.csv", sep=',', header=True, index=False)
 
 
 
