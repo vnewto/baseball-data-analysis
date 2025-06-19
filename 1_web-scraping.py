@@ -1,9 +1,3 @@
-# Dashboard:
-# sort by year (line graph) for each statistic
-# sort by team for each statistic (bar graph)
-# top 10 all-time best players or teams for each statistic (bar graph)
-
-
 #Initialize selenium and the driver. import necessary items
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -140,9 +134,12 @@ for year in range(2000, 2025):
                                         print(f'<a> tag href contains the link {a_href}, does not fit specified conditions.')
                             #if no a tag
                             elif len(a_tags) == 0:
-                                #check if team name
+                                #check if text says "top 25"
                                 td_text = td.text.strip()
-                                if td_text.lower() in teams_list:
+                                if td_text.lower() == 'top 25':
+                                    continue
+                                #check if team name
+                                elif td_text.lower() in teams_list:
                                     team = td_text #define team
                                     print(f'Team: {team}')
                                 #if not team name, then it's the number
@@ -161,8 +158,6 @@ for year in range(2000, 2025):
                 
                 count += 1
 
-
-#stats_list = ['Batting Average', 'Home Runs', 'RBI', 'Stolen Bases', 'Total Bases']
                 #append to the list
                 if stat_name.lower() == 'batting average':
                     bat_avg.append({'stat': stat_name, 'year': year_text, 'player': player_name, 'team': team, 'number': number})
@@ -199,7 +194,7 @@ for year in range(2000, 2025):
         print("couldn't get the webpage")
         print(f"Exception: {type(e).__name__} {e}")
 
-#quit driver when done
+#quit driver when done looping through all the years
 driver.quit()
 
 #create dataframes from dictionaries
@@ -209,12 +204,16 @@ rbi_df = pd.DataFrame.from_dict(rbi)
 total_bases_df = pd.DataFrame.from_dict(total_bases)
 stolen_bases_df = pd.DataFrame.from_dict(stolen_bases)
 
-# #write to csv files
-bat_avg_df.to_csv("csv/batting_average.csv", sep=',', header=True, index=False)
-home_runs_df.to_csv("csv/home_runs.csv", sep=',', header=True, index=False)
-rbi_df.to_csv("csv/rbi.csv", sep=',', header=True, index=False)
-total_bases_df.to_csv("csv/total_bases.csv", sep=',', header=True, index=False)
-stolen_bases_df.to_csv("csv/stolen_bases.csv", sep=',', header=True, index=False)
+#write to csv files
+try:
+    bat_avg_df.to_csv("csv/batting_average.csv", sep=',', header=True, index=False)
+    home_runs_df.to_csv("csv/home_runs.csv", sep=',', header=True, index=False)
+    rbi_df.to_csv("csv/rbi.csv", sep=',', header=True, index=False)
+    total_bases_df.to_csv("csv/total_bases.csv", sep=',', header=True, index=False)
+    stolen_bases_df.to_csv("csv/stolen_bases.csv", sep=',', header=True, index=False)
+    print('All csv files have been created.')
+except Exception as file_error:
+    print(f'Error writing CSV files: {file_error}')
 
 
 
