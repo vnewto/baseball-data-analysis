@@ -24,6 +24,8 @@ try:
         cursor.execute("DROP TABLE IF EXISTS rbi")
         cursor.execute("DROP TABLE IF EXISTS stolen_bases")
         cursor.execute("DROP TABLE IF EXISTS total_bases")
+        cursor.execute("DROP TABLE IF EXISTS stats_by_year")
+        cursor.execute("DROP TABLE IF EXISTS baseball_data")
 
         #create a table for each stat
         cursor.execute("""
@@ -111,6 +113,35 @@ try:
             VALUES (?, ?, ?, ?, ?)""",
             total_bases.itertuples(index=False, name=None)
         )
+
+        #join tables by year and save it as a new table
+        cursor = conn.execute("""
+        CREATE TABLE stats_by_year AS
+        SELECT ba.year, ba.stat AS ba_stat, ba.team AS ba_team, ba.number AS ba_num,
+        hr.stat AS hr_stat, hr.team AS hr_team, hr.number AS hr_num, 
+        r.stat AS r_stat, r.team AS r_team, r.number AS r_num,
+        sb.stat AS sb_stat, sb.team AS sb_team, sb.number AS sb_num,
+        tb.stat AS tb_stat, tb.team AS tb_team, tb.number AS tb_num
+        FROM batting_average ba
+        JOIN home_runs hr ON ba.year = hr.year 
+        JOIN rbi r ON hr.year = r.year
+        JOIN stolen_bases sb ON r.year = sb.year
+        JOIN total_bases tb ON sb.year = tb.year
+        """)
+
+        #merge all tables into one and save as new table
+        cursor = conn.execute("""
+        CREATE TABLE baseball_data AS 
+        SELECT * FROM batting_average 
+        UNION
+        SELECT * FROM home_runs 
+        UNION
+        SELECT * FROM rbi 
+        UNION
+        SELECT * FROM stolen_bases 
+        UNION
+        SELECT * FROM total_bases                  
+        """)
 
         #commit changes
         conn.commit()
