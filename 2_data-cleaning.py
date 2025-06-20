@@ -7,6 +7,9 @@ rbi = pd.read_csv("csv/rbi.csv")
 tot_bases = pd.read_csv("csv/total_bases.csv")
 stol_bases = pd.read_csv("csv/stolen_bases.csv")
 
+#make list of different table names
+table_names = ['bat_avg', 'home_runs', 'rbi', 'tot_bases', 'stol_bases']
+
 #drop rows with na values 
 #check length of df first, then drop na values, then recheck length to see if any were dropped
 print(f'bat_avg original length: ', len(bat_avg))
