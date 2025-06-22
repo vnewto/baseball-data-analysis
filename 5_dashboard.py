@@ -100,7 +100,7 @@ grouped_by_num = sorted_grouped.groupby('player').sum('number').reset_index().re
 #merge total_num column back in
 resorted_grouped = sorted_grouped.merge(grouped_by_num, on='player')
 #turn into a list that's sorted ascending
-ordered_teams = resorted_grouped[['player', 'total_num']].sort_values('total_num', ascending=True)['player'].tolist()
+ordered_players = resorted_grouped[['player', 'total_num']].sort_values('total_num', ascending=True)['player'].tolist()
 
 
 ## ----------------------------Create Charts ---------------------------------- ##
@@ -125,11 +125,11 @@ stats_over_time = alt.Chart(filtered_data).mark_line().encode(
 st.altair_chart(stats_over_time, use_container_width=True)
 
 
-## make grouped bar chart that plots top teams
+## make grouped bar chart that shows top players
 st.subheader('Top 5 PLayers Per Statistic')
-top_teams = alt.Chart(resorted_grouped).mark_bar().encode(
+top_players = alt.Chart(resorted_grouped).mark_bar().encode(
       x=alt.X('number:Q', title='Value'),
-      y=alt.Y('player:N', title='Player', sort=ordered_teams),
+      y=alt.Y('player:N', title='Player', sort=ordered_players),
       color=alt.Color('stat:N', title='Statistic'),
       tooltip=[
             alt.Tooltip('team:N', title='Team Name'),
@@ -138,7 +138,7 @@ top_teams = alt.Chart(resorted_grouped).mark_bar().encode(
             alt.Tooltip('number:Q', title='Value')           
       ]
 )
-st.altair_chart(top_teams, use_container_width=True)
+st.altair_chart(top_players, use_container_width=True)
 
 
 #make background map layer for teams map

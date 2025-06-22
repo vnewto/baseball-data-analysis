@@ -1,8 +1,3 @@
-# sort by year (line graph) for each statistic
-# sort by team for each statistic (bar graph)
-# top 10 all-time best players or teams for each statistic (bar graph)
-#% stolen bases out of total bases (stacked bar graph)
-
 #Spanish characters: ñ, á, é, í, ó, ú
 
 import sqlite3

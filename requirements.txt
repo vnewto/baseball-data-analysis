@@ -9,3 +9,5 @@ streamlit
 selenium
 webdriver-manager
 vega_datasets
+altair
+time
