@@ -33,26 +33,15 @@ Dependencies: Code editing software is required to run this project on your loca
 - Pip can be installed by typing the following command into your terminal: ```bash python -m pip install```
 - Virtualenv can be installed by typing the following command into your terminal: ```pip install virtualenv```
 
-1. Create and/or open a folder where you want to save the repository. In your code editor, navigate to that folder. Clone the repository using an SSH key by typing the following command into your terminal: 
-```bash
-git clone git@github.com:vnewto/baseball-data-analysis.git
-```
-2. Change your directory to the correct repository by typing the command 
+1. Create and/or open a folder where you want to save the repository. In your code editor, navigate to that folder. Clone the repository using an SSH key by typing the following command into your terminal: ```bash git clone git@github.com:vnewto/baseball-data-analysis.git```
 
-```bash
-cd baseball-data-analysis 
-```
+2. Change your directory to the correct repository by typing the command ```bash cd baseball-data-analysis```
+
 3. Set up and activate a virtual environment.
 
-For Windows users, type the following into your terminal:
+- For Windows users, type the following into your terminal: ```bash python -m venv .venv``` ```bash source .venv/Scripts/activate```
 
-```bash python -m venv .venv```
-```bash source .venv/Scripts/activate```
-
-For Mac and Linux users, type the following into your terminal:
-
-```bash python -m venv .venv```
-```bash source .venv/Scripts/activate```
+- For Mac and Linux users, type the following into your terminal: ```bash python -m venv .venv``` ```bash source .venv/Scripts/activate```
 
 4. Install the project requirements within the virtual environment by typing ```bash pip install -r requirements.txt``` into your terminal while the venv is active.
 
