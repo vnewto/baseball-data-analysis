@@ -16,15 +16,15 @@ This project is written using Python and SQLite.
 
 The project consists of five parts. Parts 1-3 need to be run in order before parts 4 and 5.
 
-1_web-scraping.py: This program uses Selenium to scrape the Hitting Statistics Leaderboards tables from the Year in Review pages of the [Baseball Almanac](https://www.baseball-almanac.com/yearmenu.shtml) website. It pulls the American League data from 2000-2024. It selects five statistics (Batting Average, Home Runs, RBI, Stolen Bases, and Total Bases) and writes one table per statistic into a csv file.
+- 1_web-scraping.py: This program uses Selenium to scrape the Hitting Statistics Leaderboards tables from the Year in Review pages of the [Baseball Almanac](https://www.baseball-almanac.com/yearmenu.shtml) website. It pulls the American League data from 2000-2024. It selects five statistics (Batting Average, Home Runs, RBI, Stolen Bases, and Total Bases) and writes one table per statistic into a csv file.
 
-2_data-cleaning.py: This program converts the csv files to dataframes and uses Pandas to perform data cleaning such as removing duplicates and null values, converting each column to the appropriate data type, and updating the team names so they are all consistent with each other. It then converts the data back into new csv files.
+- 2_data-cleaning.py: This program converts the csv files to dataframes and uses Pandas to perform data cleaning such as removing duplicates and null values, converting each column to the appropriate data type, and updating the team names so they are all consistent with each other. It then converts the data back into new csv files.
 
-3_database-import.py: This program uses SQLite to create and connect to a database, create tables, and insert the data from the cleaned csv files into the tables.
+- 3_database-import.py: This program uses SQLite to create and connect to a database, create tables, and insert the data from the cleaned csv files into the tables.
 
-4_database-query.py: This program is written with both Python and SQLite. It uses input from the terminal to prompt a user to choose a language (either Spanish or English), and then select certain queries to run on the database. The user can select top players by statistic and then choose a statistic, top teams by year and then choose a year, or players who earned top spots more than once.
+- 4_database-query.py: This program is written with both Python and SQLite. It uses input from the terminal to prompt a user to choose a language (either Spanish or English), and then select certain queries to run on the database. The user can select top players by statistic and then choose a statistic, top teams by year and then choose a year, or players who earned top spots more than once.
 
-5_dashboard.py: This program uses Streamlit to run an interactive data visualization dashboard. In the sidebar on the left, a user can choose a year range and the statistic(s) to view. The dashboard then displays three different visualizations based on those filters - a line graph plotting the statistics over the years, a bar chart showing the top 5 players for each statistic, and a map showing the location of the top teams. Altair is used to create each chart. Additionaly, the raw filtered data are shown in table form at the bottom of the page. This table can be sorted based on column by clicking on a column name.
+- 5_dashboard.py: This program uses Streamlit to run an interactive data visualization dashboard. In the sidebar on the left, a user can choose a year range and the statistic(s) to view. The dashboard then displays three different visualizations based on those filters - a line graph plotting the statistics over the years, a bar chart showing the top 5 players for each statistic, and a map showing the location of the top teams. Altair is used to create each chart. Additionaly, the raw filtered data are shown in table form at the bottom of the page. This table can be sorted based on column by clicking on a column name.
 
 
 # Getting Started
@@ -57,11 +57,11 @@ For Mac and Linux users, type the following into your terminal:
 4. Install the project requirements within the virtual environment by typing ```bash pip install -r requirements.txt``` into your terminal while the venv is active.
 
 5. Now you can run the project, view, and edit the code. Run the programs in the following order:
-1. 1_web-scraping.py
-2. 2_data-cleaning.py
-3. 3_database-import.py
-4. 4_database-query.py
-5. 5_dashboard.py
+- 1_web-scraping.py
+- 2_data-cleaning.py
+- 3_database-import.py
+- 4_database-query.py
+- 5_dashboard.py
 
 
 # Troubleshooting
