@@ -56,7 +56,7 @@ Dependencies: Code editing software is required to run this project on your loca
 # Troubleshooting
 If you are unable to clone the repository to your local machine, check your coding program for updates.
 
-If 5_dashboard.py is not loading in the browser, check your internet connection. 
+If the Streamlit dashboard is not loading in the browser, check your internet connection. 
 
 Please [submit an issue](https://github.com/vnewto/baseball-data-analysis/issues) if you have any other problems.
 
