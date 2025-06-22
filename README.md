@@ -1,14 +1,14 @@
 # Baseball Data Analysis and Visualization
-The purpose of this project is to scrape the major league baseball history website, analyze data, build a program that allows a user to query the data, and create an interactive data visualization dashboard.`
+The purpose of this project is to scrape the major league baseball history website, analyze data, build a program that allows a user to query the data, and create an interactive data visualization dashboard.
 
-The project consists of five parts:`
-    1. Web scraping program`
-    2. Data cleaning program`
-    3. Program that imports the data into a SQLite database`
-    4. Bilingual Spanish/English program hat allows a user to query the data based on specific categories`
-    5. Interactive Streamlit data visualization dashboard that allows the user to filter data based on specific categories`
+The project consists of five parts:
+    1. Web scraping program
+    2. Data cleaning program
+    3. Program that imports the data into a SQLite database
+    4. Bilingual Spanish/English program hat allows a user to query the data based on specific categories
+    5. Interactive Streamlit data visualization dashboard that allows the user to filter data based on specific categories
 
-The code could be modified to scrape more data, integrate more user-based queries, or add further charts to the dashboard.`
+The code could be modified to scrape more data, integrate more user-based queries, or add further charts to the dashboard.
 
 
 # Description
