@@ -16,13 +16,13 @@ def get_connection():
         print(f'Error connecting to database / Error de conexión: {e}')
         return None
 
-#set variable to turn language display on and off
+#set variable to turn language menu on and off
 display_language = True
 
 #choose a language
 def choose_language():
     print("""
-        Elige idioma: \n
+        Choose language / Elige idioma: \n
         1. English
         2. Español
         3. Exit / Salir
