@@ -1,6 +1,6 @@
 # Baseball Data Analysis and Visualization
-The purpose of this project is to scrape the major league baseball history website, analyze data, build a program that allows a user to query the data, and create an interactive data visualization dashboard. 
-
+The purpose of this project is to scrape the major league baseball history website, analyze data, build a program that allows a user to query the data, and create an interactive data visualization dashboard.
+\n
 The project consists of five parts:
     1. Web scraping program
     2. Data cleaning program
