@@ -1,8 +1,9 @@
-#create interactive dashboard using either streamlit or dash
-
 # Dashboard:
 # sort by year (line graph) for each statistic
-# sort by team for each statistic (bar graph)
+# sort by top 5 players for each statistic (bar graph)
+# map of team locations
+
+# Other chart ideas
 # top 5 best players or teams for each statistic (bar graph)
 # players with most records
 # players - highest percentage of bases stolen (stacked bar graph or pie chart)
@@ -15,6 +16,7 @@ import pandas as pd
 import altair as alt
 import sqlite3
 from vega_datasets import data
+
 
 ##----------------------- Set up data frames ------------------------##
 #connect to sqlite db
@@ -29,6 +31,9 @@ try:
             baseball_df = pd.read_sql_query("SELECT * FROM baseball_data", conn)
 except Exception as e:
       print(f'Error: {type(e).__name__} - {e}')
+
+#remove id column from df
+baseball_df = baseball_df.drop('id', axis=1)
 
 #generate list of all teams
 teams_list = sorted(baseball_df['team'].unique())
@@ -51,10 +56,8 @@ print('lat_long_df: \n', lat_long_df.head())
 #merge with filtered_df
 baseball_lat_long = baseball_df.merge(lat_long_df, on='team')
 
-# #add Spanish stat names to the df
-# stats_sp = {'Batting Average': 'Promedio de Bateo', 'Home Runs': 'Jonrones', 'RBI': 'Carreras Impulsadas', 'Stolen Bases': 'Bases Robadas', 'Total Bases': 'Total de Bases'}
-
 print('baseball_lat_long: \n', baseball_lat_long.head())
+
 #check that data types are correct - if not, coerce numbers to floats or integers
 print('baseball_lat_long data types: \n', baseball_lat_long.dtypes)
 
@@ -62,9 +65,9 @@ print('baseball_lat_long data types: \n', baseball_lat_long.dtypes)
 ## --------------------------- Streamlit Dashboard Setup -------------------------------##
 #Page Title
 st.title('American League Baseball Data')
+st.markdown('View American League leaders by team and statistic.')
 
 #Sidebar
-#Language Toggle Button
 
 #title
 st.sidebar.title('Filter Options')
@@ -76,7 +79,7 @@ print('min_year, max_year: ', min_year, max_year)
 yr_slider = st.sidebar.slider('Select Year Range', min_value=min_year, max_value=max_year, value=(min_year, max_year), label_visibility='visible')
 #stat selector
 stats=['Batting Average', 'Home Runs', 'RBI', 'Stolen Bases', 'Total Bases']
-stats_en = st.sidebar.multiselect('Select Stat(s)', stats)
+stats_en = st.sidebar.multiselect('Select Stat(s)', stats, default='Batting Average')
 
 
 ## -------------------Prepare data for charts-----------------------------
@@ -86,37 +89,54 @@ filtered_data = baseball_lat_long[
       (baseball_df['year'] >= yr_slider[0]) &
       (baseball_df['year'] <= yr_slider[1]) & 
       (baseball_df['stat'].isin(stats_en))
-]
+].copy()
 
-#group by team and stat to get all top teams
-filtered_grouped = filtered_data.groupby(['team', 'stat']).max().reset_index()
+#group by player and stat to get all top players
+filtered_grouped = filtered_data.groupby(['player', 'stat']).max().reset_index()
 #sort by stat and number, pull out top 5 for each stat
 sorted_grouped = filtered_grouped.sort_values(['stat', 'number'], ascending=[True, False]).groupby('stat').head(5).reset_index(drop=True)
 #add up all numbers to sort teams by total #
-grouped_by_num = sorted_grouped.groupby('team').sum('number').reset_index().rename(columns={'number': 'total_num'})
+grouped_by_num = sorted_grouped.groupby('player').sum('number').reset_index().rename(columns={'number': 'total_num'})
 #merge total_num column back in
-resorted_grouped = sorted_grouped.merge(grouped_by_num, on='team')
+resorted_grouped = sorted_grouped.merge(grouped_by_num, on='player')
 #turn into a list that's sorted ascending
-ordered_teams = resorted_grouped[['team', 'total_num']].sort_values('total_num', ascending=True)['team'].tolist()
+ordered_teams = resorted_grouped[['player', 'total_num']].sort_values('total_num', ascending=True)['player'].tolist()
 
 
 ## ----------------------------Create Charts ---------------------------------- ##
+
+# convert year column back to string so it doesn't have a comma
+filtered_data['year'] = filtered_data['year'].astype(str)
+
 #line graph that plots stat vs year
-st.subheader('Top Statistic(s) by Year')
+st.subheader(f'Top Statistic(s) by Year ({yr_slider[0]}-{yr_slider[1]})')
 stats_over_time = alt.Chart(filtered_data).mark_line().encode(
       x=alt.X('year', title='Year'),
-      y=alt.Y('number', title='Number'),
-      color=alt.Color('stat', title='Statistic')
+      y=alt.Y('number', title='Value'),
+      color=alt.Color('stat', title='Statistic'),
+      tooltip=[
+            alt.Tooltip('year:O', title='Year'),
+            alt.Tooltip('stat:N', title='Statistic'),
+            alt.Tooltip('number:Q', title='Value'),
+            alt.Tooltip('player:N', title='Player Name'),
+            alt.Tooltip('team:N', title='Team Name')            
+      ]
 )
 st.altair_chart(stats_over_time, use_container_width=True)
 
 
 ## make grouped bar chart that plots top teams
-st.subheader('Top Teams by Statistic(s)')
+st.subheader('Top 5 PLayers Per Statistic')
 top_teams = alt.Chart(resorted_grouped).mark_bar().encode(
-      x=alt.X('number:Q', title='Number'),
-      y=alt.Y('team:N', title='Team', sort=ordered_teams),
+      x=alt.X('number:Q', title='Value'),
+      y=alt.Y('player:N', title='Player', sort=ordered_teams),
       color=alt.Color('stat:N', title='Statistic'),
+      tooltip=[
+            alt.Tooltip('team:N', title='Team Name'),
+            alt.Tooltip('player:N', title='Player Name'),
+            alt.Tooltip('stat:N', title='Statistic'),
+            alt.Tooltip('number:Q', title='Value')           
+      ]
 )
 st.altair_chart(top_teams, use_container_width=True)
 
@@ -133,7 +153,13 @@ top_teams_map = alt.Chart(filtered_data).mark_circle().encode(
     longitude='long:Q',
     latitude='lat:Q',
     size=alt.value(100),
-    tooltip=['team', 'stat']
+    tooltip=[
+            alt.Tooltip('year:O', title='Year'),
+            alt.Tooltip('stat:N', title='Statistic'),
+            alt.Tooltip('number:Q', title='Value'),
+            alt.Tooltip('player:N', title='Player Name'),
+            alt.Tooltip('team:N', title='Team Name')            
+      ]
 ).project(
     'albersUsa'
 )
@@ -143,8 +169,9 @@ map_with_teams = background + top_teams_map
 st.subheader('Top Teams by Location')
 st.altair_chart(map_with_teams, use_container_width=True)
 
-st.subheader('All Data')
+st.subheader('Data Table')
 st.dataframe(filtered_data)
 
-#add team / player to tooltips (add year in map too?)
-#fix commas in years
+st.markdown('\n Data Source: Baseball Almanac - Year by Year MLB History')
+st.link_button('Baseball Almanac', 'https://www.baseball-almanac.com/yearmenu.shtml', help='Go to Baseball Almanac site', icon='⚾')
+
