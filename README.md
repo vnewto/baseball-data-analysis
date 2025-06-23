@@ -26,6 +26,8 @@ The project consists of five parts. Parts 1-3 need to be run in order before par
 
 - 5_dashboard.py: This program uses Streamlit to run an interactive data visualization dashboard. In the sidebar on the left, a user can choose a year range and the statistic(s) to view. The dashboard then displays three different visualizations based on those filters - a line graph plotting the statistics over the years, a bar chart showing the top 5 players for each statistic, and a map showing the location of the top teams. Altair is used to create each chart. Additionaly, the raw filtered data are shown in table form at the bottom of the page. This table can be sorted based on column by clicking on a column name.
 
+![Baseball Data Dashboard Preview](img/StreamlitDashboard1.png)
+![Top Teams Bar Graph and Map](img/StreamlitDashboard2.png)
 
 # Getting Started
 Dependencies: Code editing software is required to run this project on your local machine. GitHub also offers their own free software called [GitHub Desktop](https://github.com/apps/desktop) which can be downloaded if needed. Python, pip, and the virtualenv package are also required. 
